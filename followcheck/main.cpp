@@ -80,24 +80,22 @@ int main() {
         fprintf(stderr, "Can't open database: %s\n\n", sqlite3_errmsg(db));
         return(0);
     }
-    else {
+    /*else {
         fprintf(stdout, "Opened database successfully\n\n");
-    }
+    }*/
 
     int select;
+    bool running = true;
 
     do {
-        std::cout << "\nWhat would you like to do?\n 1) Refresh Database\n 2) Display following, who do not follow back\n 3) Display followers, whom you are not following back\n 4) Exit\n";
+        std::cout << "What would you like to do?\n 1) Refresh follower data\n 2) Display following, who do not follow back\n 3) Display followers, whom you are not following back\n 4) Exit\n";
         std::cin >> select;
 
         switch (select) {
             case 1:
-                sqlexec("DROP TABLE Followers;");
-                sqlexec("DROP TABLE Following;");
-                sqlexec("CREATE TABLE IF NOT EXISTS Followers("  \
-                    "Name        TEXT);");
-                sqlexec("CREATE TABLE IF NOT EXISTS Following("  \
-                    "Name        TEXT);");
+                
+                sqlexec("DROP TABLE IF EXISTS Followers; DROP TABLE IF EXISTS Following;");
+                sqlexec("CREATE TABLE Followers(Name        TEXT); CREATE TABLE Following(Name        TEXT);");
 
                 searchFile("follower.htm", "_0imsa");
                 searchFile("following.htm", "_0imsa");
@@ -110,12 +108,17 @@ int main() {
                 sqlexec("SELECT Name FROM Followers EXCEPT SELECT Name FROM Following;");
                 break;
             case 4:
+                running = false;
                 break;
             default:
                 std::cout << "Invalid option, Please enter option (1-4).";
+                if (!std::cin.good()) {
+                    std::cin.clear();
+                    std::cin.ignore(INT_MAX, '\n');
+                }
                 break;
         }
-    } while (select != 4);
+    } while (running);
 
     /* Close database */
     sqlite3_close(db);
