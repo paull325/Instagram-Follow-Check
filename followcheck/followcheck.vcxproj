@@ -163,7 +163,6 @@
     <ClInclude Include="extern\fmt\format-inl.h" />
     <ClInclude Include="extern\fmt\format.h" />
     <ClInclude Include="extern\sqlite3\sqlite3.h" />
-    <ClInclude Include="extern\sqlite3\sqlite3ext2.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

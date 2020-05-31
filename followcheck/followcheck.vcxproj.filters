@@ -47,8 +47,5 @@
     <ClInclude Include="extern\fmt\format-inl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="extern\sqlite3\sqlite3ext2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
