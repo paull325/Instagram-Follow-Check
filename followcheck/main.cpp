@@ -1,45 +1,14 @@
-#include <fstream>
-#include <sqlite3.h>
-
 #include "CustomString.h"
 
-using String = std::string;
+#include "Database/FollowerDatabase.h"
 
-sqlite3* db;
-char* zErrMsg = 0;
-int rc;
+#include <memory>
+#include <string>
+#include <fstream>
 
-static int callback(void* NotUsed, int argc, char** argv, char** azColName) {
-    int i;
-    for (i = 0; i < argc; i++) {
-        printf("%s = %s\n", azColName[i], argv[i] ? argv[i] : "NULL");
-    }
-    printf("\n");
-    return 0;
-}
-
-void sqlexec(String command) {                                                          /* Execute SQL statement */
-
-    rc = sqlite3_exec(db, command.c_str(), callback, 0, &zErrMsg);
-
-    if (rc != SQLITE_OK) {
-        fprintf(stderr, "SQL error: %s\n", zErrMsg);
-        sqlite3_free(zErrMsg);
-    }
-    else {
-       // std::cout << "Succesful, Command: " << command << "\n";
-    }
-}
-
-void writeInTable(String tableName, String content) {
-    String sql = "INSERT INTO " + tableName + " (NAME) "  \
-        "VALUES ('" + content + "'); ";
-
-    sqlexec(sql);
-}
-
-void searchFile(String file, String search) {       //not only search, but also write in table
-
+//not only search, but also write in table
+void searchFile(const std::unique_ptr<db::FollowerDatabase>& db, const std::string& file, const std::string& search)
+{
     CustomString line;
     CustomString name;
 
@@ -51,16 +20,21 @@ void searchFile(String file, String search) {       //not only search, but also 
     {
         while (getline(followerFile, line.content))
         {
-            if (line.content.find(search) != std::string::npos) {
-
+            if (line.content.find(search) != std::string::npos)
+            {
                 foundNext = line.findNext(search);
 
-                while (foundNext != std::string::npos) {
+                while (foundNext != std::string::npos)
+                {
                     name.content = line.section((unsigned int)foundNext + 16, '"');         //16 characters after unique keyword the username starts
-                    if(file== "follower.htm")
-                        writeInTable("Followers", name.content);
+                    if (file == "follower.htm")
+                    {
+                        db->AddFollower(name.content);
+                    }
                     else if (file == "following.htm")
-                        writeInTable("Following", name.content);
+                    {
+                        db->AddFollowing(name.content);
+                    }
                     foundNext = line.findNext(search);
                 }
                 line.resetSearchPos();
@@ -68,60 +42,61 @@ void searchFile(String file, String search) {       //not only search, but also 
         }
         followerFile.close();
     }
-    else std::cout << "Unable to open file\n";
+    else
+    {
+        std::cout << "Unable to open file\n";
+    }
 }
 
-int main() { 
+int main() 
+{ 
+    const auto followerDB = db::FollowerDatabase::OpenDatabase("names.db");
 
-    /* Open database */
-    rc = sqlite3_open("names.db", &db);
-
-    if (rc) {
-        fprintf(stderr, "Can't open database: %s\n\n", sqlite3_errmsg(db));
-        return(0);
+    if (!followerDB)
+    {
+        return 1;
     }
-    /*else {
-        fprintf(stdout, "Opened database successfully\n\n");
-    }*/
 
     int select;
     bool running = true;
 
-    do {
-        std::cout << "What would you like to do?\n 1) Refresh follower data\n 2) Display following, who do not follow back\n 3) Display followers, whom you are not following back\n 4) Exit\n";
+    do 
+    {
+        std::cout << "What would you like to do?" << std::endl
+            << "1) Refresh follower data" << std::endl
+            << "2) Display following, who do not follow back" << std::endl
+            << "3) Display followers, whom you are not following back" << std::endl
+            << "4) Exit" << std::endl;
         std::cin >> select;
 
-        switch (select) {
+        switch (select) 
+        {
             case 1:
-                
-                sqlexec("DROP TABLE IF EXISTS Followers; DROP TABLE IF EXISTS Following;");
-                sqlexec("CREATE TABLE Followers(Name        TEXT); CREATE TABLE Following(Name        TEXT);");
+                followerDB->RecreateTables();
 
-                searchFile("follower.htm", "_0imsa");
-                searchFile("following.htm", "_0imsa");
-                std::cout << "Refresh complete.";
+                searchFile(followerDB, "follower.htm", "_0imsa");
+                searchFile(followerDB, "following.htm", "_0imsa");
+                std::cout << "Refresh complete." << std::endl;
                 break;
             case 2:
-                sqlexec("SELECT Name FROM Following EXCEPT SELECT Name FROM Followers;");
+                followerDB->PrintAllPeopleNotFollowingBack();
                 break;
             case 3:
-                sqlexec("SELECT Name FROM Followers EXCEPT SELECT Name FROM Following;");
+                followerDB->PrintAllPeopleYouAreNotFollowingBack();
                 break;
             case 4:
                 running = false;
                 break;
             default:
                 std::cout << "Invalid option, Please enter option (1-4).";
-                if (!std::cin.good()) {
+                if (!std::cin.good()) 
+                {
                     std::cin.clear();
                     std::cin.ignore(INT_MAX, '\n');
                 }
                 break;
         }
     } while (running);
-
-    /* Close database */
-    sqlite3_close(db);
 
     return 0;
 }

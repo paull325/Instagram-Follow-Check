@@ -21,9 +21,30 @@
     <ClCompile Include="CustomString.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Database\FollowerDatabase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="extern\sqlite3\sqlite3.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CustomString.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Database\FollowerDatabase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\sqlite3\sqlite3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\fmt\format.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\fmt\core.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="extern\fmt\format-inl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
