@@ -78,13 +78,13 @@ bool FollowerDatabase::RecreateTables()
 
 bool FollowerDatabase::PrintAllPeopleNotFollowingBack()
 {
-	const std::string followingNotFollowingBack = fmt::format(SQLScriptTemplate::ExclusiveEntries, Tables::Following.name, Tables::Following.name);
+	const std::string followingNotFollowingBack = fmt::format(SQLScriptTemplate::ExclusiveEntries, Tables::Following.name, Tables::Followers.name);
 	return ExecuteSQLStatement(followingNotFollowingBack);
 }
 
 bool FollowerDatabase::PrintAllPeopleYouAreNotFollowingBack()
 {
-	const std::string followersYouAreNotFollowingBack = fmt::format(SQLScriptTemplate::ExclusiveEntries, Tables::Following.name, Tables::Following.name);
+	const std::string followersYouAreNotFollowingBack = fmt::format(SQLScriptTemplate::ExclusiveEntries, Tables::Followers.name, Tables::Following.name);
 	return ExecuteSQLStatement(followersYouAreNotFollowingBack);
 }
 
