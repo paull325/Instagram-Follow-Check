@@ -69,11 +69,11 @@ FollowerDatabase::~FollowerDatabase()
 
 bool FollowerDatabase::RecreateTables()
 {
-	const std::string rectreateFollowersTableScript = fmt::format(SQLScriptTemplate::DropAndRecreateTable, Tables::Followers.name, Tables::Followers.columns);
+	const std::string recreateFollowersTableScript = fmt::format(SQLScriptTemplate::DropAndRecreateTable, Tables::Followers.name, Tables::Followers.columns);
 
-	const std::string rectreateFollowingTableScript = fmt::format(SQLScriptTemplate::DropAndRecreateTable, Tables::Following.name, Tables::Following.columns);
+	const std::string recreateFollowingTableScript = fmt::format(SQLScriptTemplate::DropAndRecreateTable, Tables::Following.name, Tables::Following.columns);
 
-	return ExecuteSQLStatement(rectreateFollowersTableScript + rectreateFollowingTableScript);
+	return ExecuteSQLStatement(recreateFollowersTableScript + recreateFollowingTableScript);
 }
 
 bool FollowerDatabase::PrintAllPeopleNotFollowingBack()

@@ -29,7 +29,7 @@ std::size_t CustomString::findNext(String search) {
 
 	if (found != std::string::npos) {
 
-		searchPosition = found + 100 + (content.length() - searchContent.length()); //next search will be 100 characters after last result position
+		searchPosition = found +  (content.length() - searchContent.length()) + 1; //next search will start 1 character after last result position
 		return found + (content.length() - searchContent.length());		//return integer position of search term in content (NOT position in searchContent)
 
 	}
